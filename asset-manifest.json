@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/tiaohai-web/static/css/main.b699d714.css",
-    "main.js": "/tiaohai-web/static/js/main.2c9e2e4d.js",
+    "main.js": "/tiaohai-web/static/js/main.78b4b098.js",
     "static/js/511.3e56ef14.chunk.js": "/tiaohai-web/static/js/511.3e56ef14.chunk.js",
     "index.html": "/tiaohai-web/index.html",
     "main.b699d714.css.map": "/tiaohai-web/static/css/main.b699d714.css.map",
-    "main.2c9e2e4d.js.map": "/tiaohai-web/static/js/main.2c9e2e4d.js.map",
+    "main.78b4b098.js.map": "/tiaohai-web/static/js/main.78b4b098.js.map",
     "511.3e56ef14.chunk.js.map": "/tiaohai-web/static/js/511.3e56ef14.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b699d714.css",
-    "static/js/main.2c9e2e4d.js"
+    "static/js/main.78b4b098.js"
   ]
 }
