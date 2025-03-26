@@ -1,119 +1,36 @@
-import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-const Chat: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-
-    const userMessage: Message = {
-      role: 'user',
-      content: input.trim(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
-
-    try {
-      const response = await axios.post('http://localhost:3001/api/chat', {
-        message: input.trim(),
-      });
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response.data.answer,
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage: Message = {
-        role: 'assistant',
-        content: '抱歉，发生了一些错误。请稍后再试。',
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+function Chat() {
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* 聊天记录 */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 h-[60vh] overflow-y-auto">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`mb-4 ${
-              message.role === 'user' ? 'text-right' : 'text-left'
-            }`}
-          >
-            <div
-              className={`inline-block p-3 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-accent text-white'
-                  : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {message.content}
-            </div>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-4xl font-bold text-gray-900 mb-8">AI 智能推荐</h1>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="mb-8">
+          <p className="text-gray-600 mb-4">
+            让AI为您推荐最适合的美食选择。告诉我您的喜好，我们会为您找到最佳推荐。
+          </p>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-800 mb-2">您可以这样问：</p>
+            <ul className="list-disc list-inside text-gray-600 space-y-2">
+              <li>有什么适合下酒的小菜推荐？</li>
+              <li>想吃辣的，有什么推荐？</li>
+              <li>有什么特色菜品？</li>
+            </ul>
           </div>
-        ))}
-        {loading && (
-          <div className="text-left">
-            <div className="inline-block p-3 rounded-lg bg-gray-100 text-gray-800">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+        </div>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="输入您的问题..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          />
+          <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            发送
+          </button>
+        </div>
       </div>
-
-      {/* 输入框 */}
-      <form onSubmit={handleSubmit} className="flex space-x-4">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="告诉我您的喜好，我来为您推荐..."
-          className="input flex-1"
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className={`btn btn-primary ${
-            loading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={loading}
-        >
-          发送
-        </button>
-      </form>
     </div>
   );
-};
+}
 
 export default Chat; 
