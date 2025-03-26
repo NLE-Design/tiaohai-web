@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/tiaohai-web/static/css/main.f09ea6fe.css",
+    "main.js": "/tiaohai-web/static/js/main.6ceb5685.js",
+    "static/js/511.3e56ef14.chunk.js": "/tiaohai-web/static/js/511.3e56ef14.chunk.js",
+    "index.html": "/tiaohai-web/index.html",
+    "main.f09ea6fe.css.map": "/tiaohai-web/static/css/main.f09ea6fe.css.map",
+    "main.6ceb5685.js.map": "/tiaohai-web/static/js/main.6ceb5685.js.map",
+    "511.3e56ef14.chunk.js.map": "/tiaohai-web/static/js/511.3e56ef14.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f09ea6fe.css",
+    "static/js/main.6ceb5685.js"
+  ]
+}
