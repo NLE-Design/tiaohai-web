@@ -5,6 +5,10 @@ interface Message {
   content: string;
 }
 
+// Dify API 配置
+const DIFY_API_KEY = 'app-lrAlpUg3loqDNxgQlE1c6woM';
+const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
+
 function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -32,25 +36,44 @@ function Chat() {
     setInput('');
     setLoading(true);
 
-    // 模拟AI响应
-    setTimeout(() => {
+    try {
+      const response = await fetch(DIFY_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: {},
+          query: input.trim(),
+          response_mode: "blocking",
+          conversation_id: null,
+          user: "web-user"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('API 请求失败');
+      }
+
+      const data = await response.json();
+      
       const aiMessage: Message = {
         role: 'assistant',
-        content: `根据您的喜好，我推荐：
-
-1. Freedom (Lager, 5% ABV)
-   - 清爽可口，适合入门
-   - 价格: $15
-
-2. YUZU (Lager, 4.8% ABV)
-   - 柚子风味，清新果香
-   - 价格: $22
-
-您觉得这些推荐如何？我可以根据您的反馈继续调整。`,
+        content: data.answer,
       };
+
       setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('API 错误:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: '抱歉，我现在遇到了一些问题。请稍后再试。',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
