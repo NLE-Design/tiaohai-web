@@ -1,8 +1,16 @@
+// 在文件顶部添加类型声明
+interface Window {
+  webkitSpeechRecognition: any;
+  SpeechRecognition: any;
+  webkitAudioContext: typeof AudioContext;
+}
+
 import React, { useState, useRef, useEffect, Suspense, useMemo, useCallback, useImperativeHandle } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, useProgress, Html, useGLTF, Instances, Instance } from '@react-three/drei';
 import * as THREE from 'three';
 import { Physics, useBox, usePlane, useSphere } from '@react-three/cannon';
+import CryptoJS from 'crypto-js';
 
 // 导入图片
 import placeholderImg from '../images/beers/Ritual De Lo Habitual-NOW.jpg';
@@ -650,6 +658,209 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [detectedBeers, setDetectedBeers] = useState<Beer[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // 添加语音相关的状态
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  // 添加 Assembly AI 配置
+  const ASSEMBLY_AI_API_KEY = 'c11ec0679088432eb6aa5ff0e05f297a';
+
+  // 修改语音识别相关代码
+  const startListening = () => {
+    try {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('您的浏览器不支持语音识别功能');
+        return;
+      }
+
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US'; // 修改为英文识别
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        console.log('语音识别已启动');
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('识别结果:', transcript);
+        setInput(transcript);
+        handleVoiceInput(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('语音识别错误:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        console.log('语音识别结束');
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+
+    } catch (error) {
+      console.error('启动语音识别时出错:', error);
+      setIsListening(false);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  // 处理语音输入
+  const handleVoiceInput = async (transcript: string) => {
+    if (!transcript.trim()) return;
+
+    const userMessage: Message = {
+      role: 'user',
+      content: transcript,
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
+    setDetectedBeers([]); // 清空之前检测的啤酒
+
+    try {
+      const response = await fetch(DIFY_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: {},
+          query: transcript,
+          response_mode: "blocking",
+          conversation_id: null,
+          user: "web-user"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const data = await response.json();
+      
+      const aiMessage: Message = {
+        role: 'assistant',
+        content: data.answer,
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // 语音播放AI回复
+      speakText(data.answer);
+      
+      const beersInResponse = detectBeersInMessage(data.answer);
+      if (beersInResponse.length > 0) {
+        setDetectedBeers(beersInResponse);
+      }
+    } catch (error) {
+      console.error('Request failed:', error);
+      
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: '抱歉，我现在无法回应。请稍后再试。',
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 添加 ElevenLabs 配置
+  const ELEVEN_LABS_API_KEY = 'sk_dd9edeb61832cdcdfc0034c8d5659caba3af2204a6e3ab4c';
+  const ELEVEN_LABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel voice ID，温暖友好的女声
+
+  // 修改语音合成功能
+  const speakText = async (text: string) => {
+    try {
+      setIsSpeaking(true);
+
+      const response = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_LABS_VOICE_ID}`,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': ELEVEN_LABS_API_KEY,
+          },
+          body: JSON.stringify({
+            text: text,
+            model_id: 'eleven_monolingual_v1',
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+              style: 0.5,
+              use_speaker_boost: true
+            }
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('TTS API request failed');
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        // 如果 ElevenLabs 失败，回退到浏览器原生 TTS
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'en-US';
+          utterance.onend = () => setIsSpeaking(false);
+          utterance.onerror = () => setIsSpeaking(false);
+          window.speechSynthesis.speak(utterance);
+        }
+      };
+
+      audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      setIsSpeaking(false);
+      // 如果出错，回退到浏览器原生TTS
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  };
+
+  // 停止语音输出
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
 
   // 过滤有效的啤酒数据
   const validBeers: Beer[] = menuData.filter((item: any): item is Beer => 
@@ -813,26 +1024,58 @@ const Home: React.FC = () => {
               </div>
             )}
 
-            {/* 输入框 */}
+            {/* 输入框和按钮区域 */}
             <div className="border-t border-gray-200 p-4">
-              <form onSubmit={handleSubmit} className="flex space-x-4">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Tell me your flavor preferences, and I'll recommend..."
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 bg-white"
-                  disabled={loading}
-                />
-                <button
-                  type="submit"
-                  className={`px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  disabled={loading}
-                >
-                  Send
-                </button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex space-x-4">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="告诉我你喜欢的口味，我来推荐啤酒..."
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 bg-white"
+                    disabled={loading || isListening}
+                  />
+                  <button
+                    type="submit"
+                    className={`px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors ${
+                      loading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    disabled={loading || isListening}
+                  >
+                    发送
+                  </button>
+                </div>
+                
+                {/* 语音控制按钮 */}
+                <div className="flex justify-center space-x-4">
+                  <button
+                    type="button"
+                    onClick={isListening ? stopListening : startListening}
+                    className={`px-6 py-2 rounded-full flex items-center space-x-2 transition-colors ${
+                      isListening ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    disabled={loading}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                    </svg>
+                    <span>{isListening ? '停止语音输入' : '开始语音输入'}</span>
+                  </button>
+                  
+                  {isSpeaking && (
+                    <button
+                      type="button"
+                      onClick={stopSpeaking}
+                      className="px-6 py-2 bg-gray-100 text-gray-700 rounded-full flex items-center space-x-2 hover:bg-gray-200 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
+                      </svg>
+                      <span>停止播放</span>
+                    </button>
+                  )}
+                </div>
               </form>
             </div>
           </div>
