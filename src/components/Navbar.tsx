@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-bold text-accent">
-            跳海
+            Tiaohai
           </Link>
           
           <div className="hidden md:flex space-x-8">
@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
                 isActive('/') ? 'text-accent' : 'text-gray-500 hover:text-accent'
               }`}
             >
-              首页
+              Home
             </Link>
             <Link
               to="/menu"
@@ -31,38 +31,11 @@ const Navbar: React.FC = () => {
                 isActive('/menu') ? 'text-accent' : 'text-gray-500 hover:text-accent'
               }`}
             >
-              酒单
-            </Link>
-            <Link
-              to="/chat"
-              className={`text-sm font-medium ${
-                isActive('/chat') ? 'text-accent' : 'text-gray-500 hover:text-accent'
-              }`}
-            >
-              AI推荐
-            </Link>
-            <Link
-              to="/community"
-              className={`text-sm font-medium ${
-                isActive('/community') ? 'text-accent' : 'text-gray-500 hover:text-accent'
-              }`}
-            >
-              社区
+              Menu
             </Link>
           </div>
 
-          <div className="flex items-center">
-            <Link to="/profile" className="text-gray-700 hover:text-gray-900">
-              <div className="flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>我的</span>
-              </div>
-            </Link>
-          </div>
-
-          {/* 移动端菜单按钮 */}
+          {/* Mobile menu button */}
           <button className="md:hidden">
             <svg
               className="h-6 w-6"
