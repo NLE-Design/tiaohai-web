@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/tiaohai-web/static/css/main.436c18c5.css",
-    "main.js": "/tiaohai-web/static/js/main.e138f839.js",
+    "main.css": "/tiaohai-web/static/css/main.64335236.css",
+    "main.js": "/tiaohai-web/static/js/main.cb5978cf.js",
     "static/js/511.3e56ef14.chunk.js": "/tiaohai-web/static/js/511.3e56ef14.chunk.js",
     "static/media/Yose Rose.jpg": "/tiaohai-web/static/media/Yose Rose.b3ed5227817a43a435c5.jpg",
     "static/media/Freedom.jpg": "/tiaohai-web/static/media/Freedom.fbb9f3f2ae797d3b9d38.jpg",
@@ -19,12 +19,12 @@
     "static/media/Cacao Stout.jpg": "/tiaohai-web/static/media/Cacao Stout.b753e42ac2d1ed6c5f95.jpg",
     "static/media/Yellow Van.jpg": "/tiaohai-web/static/media/Yellow Van.d447bbc3bb1e43c2f799.jpg",
     "index.html": "/tiaohai-web/index.html",
-    "main.436c18c5.css.map": "/tiaohai-web/static/css/main.436c18c5.css.map",
-    "main.e138f839.js.map": "/tiaohai-web/static/js/main.e138f839.js.map",
+    "main.64335236.css.map": "/tiaohai-web/static/css/main.64335236.css.map",
+    "main.cb5978cf.js.map": "/tiaohai-web/static/js/main.cb5978cf.js.map",
     "511.3e56ef14.chunk.js.map": "/tiaohai-web/static/js/511.3e56ef14.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.436c18c5.css",
-    "static/js/main.e138f839.js"
+    "static/css/main.64335236.css",
+    "static/js/main.cb5978cf.js"
   ]
 }
