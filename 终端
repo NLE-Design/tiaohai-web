@@ -1,0 +1,5 @@
+# 进入图片集目录
+cd "/Users/weileming/Documents/03 技能/cursor/跳海AI App/Sources/Resources/Assets.xcassets/menu.imageset"
+
+# 重命名图片文件与图片集名称一致
+mv drink.jpg menu.jpg
