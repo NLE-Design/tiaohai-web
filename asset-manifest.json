@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/tiaohai-web/static/css/main.1b8f1977.css",
-    "main.js": "/tiaohai-web/static/js/main.7ada56b0.js",
-    "static/js/453.cd62e727.chunk.js": "/tiaohai-web/static/js/453.cd62e727.chunk.js",
+    "main.css": "/tiaohai-web/static/css/main.bcd020d2.css",
+    "main.js": "/tiaohai-web/static/js/main.87721e44.js",
+    "static/js/511.3e56ef14.chunk.js": "/tiaohai-web/static/js/511.3e56ef14.chunk.js",
     "static/media/Yose Rose.jpg": "/tiaohai-web/static/media/Yose Rose.b3ed5227817a43a435c5.jpg",
     "static/media/Freedom.jpg": "/tiaohai-web/static/media/Freedom.fbb9f3f2ae797d3b9d38.jpg",
     "static/media/The Mango Man.jpg": "/tiaohai-web/static/media/The Mango Man.f9de0468dc87cf8959bd.jpg",
@@ -19,12 +19,12 @@
     "static/media/Cacao Stout.jpg": "/tiaohai-web/static/media/Cacao Stout.b753e42ac2d1ed6c5f95.jpg",
     "static/media/Yellow Van.jpg": "/tiaohai-web/static/media/Yellow Van.d447bbc3bb1e43c2f799.jpg",
     "index.html": "/tiaohai-web/index.html",
-    "main.1b8f1977.css.map": "/tiaohai-web/static/css/main.1b8f1977.css.map",
-    "main.7ada56b0.js.map": "/tiaohai-web/static/js/main.7ada56b0.js.map",
-    "453.cd62e727.chunk.js.map": "/tiaohai-web/static/js/453.cd62e727.chunk.js.map"
+    "main.bcd020d2.css.map": "/tiaohai-web/static/css/main.bcd020d2.css.map",
+    "main.87721e44.js.map": "/tiaohai-web/static/js/main.87721e44.js.map",
+    "511.3e56ef14.chunk.js.map": "/tiaohai-web/static/js/511.3e56ef14.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1b8f1977.css",
-    "static/js/main.7ada56b0.js"
+    "static/css/main.bcd020d2.css",
+    "static/js/main.87721e44.js"
   ]
 }
